@@ -1,0 +1,96 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>index.html</title> 
+	<link rel="stylesheet" href="jquery.mobile-1.0.1.min.css" />
+	<script type="text/javascript" charset="utf-8" src="jquery.js"></script>
+	<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.0.1.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="cordova.js" ></script>
+	<!--<script type="text/javascript" charset="utf-8" src="cordova-2.0.0.js" ></script>-->
+	<script type="text/javascript" charset="utf-8">	
+	
+	$( function() {
+
+	});
+	$(document).ready(function(){
+		console.log("jquery ready");
+		/*$("p").each(function(index, element){
+			alert(index + "-" + $(element).html() + "");
+		});*/
+		alert("Welcome to HelloPhoneGap");
+		//alert($("ul#selector li:first").html());
+		document.addEventListener("deviceready", onDeviceReady, false);	
+		console.log("register the listener");
+	});
+	
+	function onDeviceReady()
+	{
+		console.log("onDeviceReady");
+		console.log(device);
+		$(".content").html("<ul data-role='listview'><li>"+device.name+"</li><li>"+device.cordova+"</li><li>"+device.platform+"</li><li>"+device.version+"</li><li>"+device.uuid+"</li></ul>");	
+	}
+	</script>
+</head> 
+<body>
+<!-- begin first page -->
+<!--<p> another parapraph </p>
+<p class="title">-->
+
+  Paragraph with class title practice...
+</p>
+<div id="main" data-role="page" >
+  <header data-role="header">
+  <h1>Hello PhoneGap</h1></header>
+    <div data-role="content" class="content">
+      <h3>霈曉�靽⊥</h3>
+    </div>
+    <div data-role="content">
+      <h2> Page Nav </h2>
+        <a data-role="button" href="#page2">Page Navigation</a>
+        <a data-role="button" href="http://10.0.0.144:4000">Shuttle OTA</a>
+        <a data-role="button" href="#dialog" data-rel="dialog" data-transition="pop"> Open Dialog </a>
+    </div>
+  <footer data-role="footer" class="ui-bar">
+    <a data-role="button" href="index.html" data-icon="delete">Remove</a>
+    <a data-role="button" href="index.html" data-icon="plus">Add</a>
+    <a data-role="button" href="#main" data-icon="arrow-u">Up</a>
+    <a data-role="button" href="#page2" data-icon="arrow-d">Down</a>
+  </footer>
+</div>
+<!-- end first page -->
+<!-- Second Page -->
+<div id="page2" data-role="page">
+	<header data-role="header"><h1> Second Page</h1></header>
+	   <div data-role="content">
+	     <h1> Second Page</h1>
+	     <div data-role="fieldcontain">
+           <label for="onoff-slider">On/Off Switch:</label>
+           <select name="onoff-slider" id="onoff-slider" datarole="slider">
+             <option value="off">Off</option>
+             <option value="on">On</option>
+           </select>
+         </div>
+	   </div>
+	   <footer data-role="footer" class="ui-bar">
+    <a data-role="button" href="index.html" data-icon="delete">Remove</a>
+    <a data-role="button" href="index.html" data-icon="plus">Add</a>
+    <a data-role="button" href="#main" data-icon="arrow-u">Up</a>
+    <a data-role="button" href="#dialog" data-icon="arrow-d">Down</a>
+  </footer>
+</div>
+<!-- end Second page -->
+<!-- Dialog Page -->
+<div id="dialog" data-role="page">
+	<header data-role="header"><h1> Dialog Page</h1></header>
+	   <div align="center" data-role="content">
+	     <h1> Dialog Page</h1>
+	   </div>
+	   <footer data-role="footer">
+         <h4>Press back to go back to main page</h4></footer>
+</div>
+<!-- end Dialog page -->
+
+</body>
+</html>
