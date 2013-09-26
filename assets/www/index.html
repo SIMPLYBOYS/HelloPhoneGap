@@ -15,6 +15,26 @@
 
 	});
 	$(document).ready(function(){
+		$("#mybutton").bind("click", function(event){
+		  alert("clicked mybutton!!");
+	    });
+
+        $("#tap").bind("tap", function() {
+          alert("TapEvent");
+        });
+        $("#taphold").bind("taphold", function() {
+          alert("Tap Hold Event");
+        });
+        $("#swipe").bind("swipe", function() {
+          alert("Swipe Event");
+        });
+        $("#swipeleft").bind("swipeleft", function() {
+          alert("Swipe Left Event");
+        });
+        $("#swiperight").bind("swiperight", function() {
+          alert("Swipe Right Event");
+        });
+
 		console.log("jquery ready");
 		/*$("p").each(function(index, element){
 			alert(index + "-" + $(element).html() + "");
@@ -48,9 +68,17 @@
     </div>
     <div data-role="content">
       <h2> Page Nav </h2>
+        <button id="mybutton">mybutton</button>
         <a data-role="button" href="#page2">Page Navigation</a>
         <a data-role="button" href="http://10.0.0.144:4000">Shuttle OTA</a>
         <a data-role="button" href="#dialog" data-rel="dialog" data-transition="pop"> Open Dialog </a>
+        <br>
+        <br>
+        <p id="tap">Tap here</p>
+        <p id="taphold">Tap and hold here</p>
+        <p id="swipe">Swipe in this area.</p>
+        <p id="swipeleft">Swipe Left &lt;-- in this area.</p>
+        <p id="swiperight">Swipe Right -- &gt; in this area.</p>
     </div>
   <footer data-role="footer" class="ui-bar">
     <a data-role="button" href="index.html" data-icon="delete">Remove</a>
@@ -65,13 +93,17 @@
 	<header data-role="header"><h1> Second Page</h1></header>
 	   <div data-role="content">
 	     <h1> Second Page</h1>
-	     <div data-role="fieldcontain">
-           <label for="onoff-slider">On/Off Switch:</label>
-           <select name="onoff-slider" id="onoff-slider" datarole="slider">
-             <option value="off">Off</option>
-             <option value="on">On</option>
-           </select>
-         </div>
+	       <ul data-role="listview" data-theme="c">
+             <li>
+               <a href="usa.HTML">USA</a>
+             </li>
+             <li>
+               <a href="uk.HTML">UK</a>
+            </li>
+            <li>
+              <a href="russia.HTML">Russia</a>
+            </li>
+           </ul>
 	   </div>
 	   <footer data-role="footer" class="ui-bar">
     <a data-role="button" href="index.html" data-icon="delete">Remove</a>
@@ -84,7 +116,7 @@
 <!-- Dialog Page -->
 <div id="dialog" data-role="page">
 	<header data-role="header"><h1> Dialog Page</h1></header>
-	   <div align="center" data-role="content">
+	   <div data-role="content">
 	     <h1> Dialog Page</h1>
 	   </div>
 	   <footer data-role="footer">
