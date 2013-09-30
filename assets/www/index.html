@@ -10,47 +10,128 @@
 	<script type="text/javascript" charset="utf-8" src="cordova.js" ></script>
 	<!--<script type="text/javascript" charset="utf-8" src="cordova-2.0.0.js" ></script>-->
 	<script type="text/javascript" charset="utf-8">	
-	
-	$( function() {
-
-	});
-	$(document).ready(function(){
-		$("#mybutton").bind("click", function(event){
-		  alert("clicked mybutton!!");
-	    });
-
-        $("#tap").bind("tap", function() {
-          alert("TapEvent");
-        });
-        $("#taphold").bind("taphold", function() {
-          alert("Tap Hold Event");
-        });
-        $("#swipe").bind("swipe", function() {
-          alert("Swipe Event");
-        });
-        $("#swipeleft").bind("swipeleft", function() {
-          alert("Swipe Left Event");
-        });
-        $("#swiperight").bind("swiperight", function() {
-          alert("Swipe Right Event");
-        });
-
-		console.log("jquery ready");
-		/*$("p").each(function(index, element){
-			alert(index + "-" + $(element).html() + "");
-		});*/
-		alert("Welcome to HelloPhoneGap");
-		//alert($("ul#selector li:first").html());
-		document.addEventListener("deviceready", onDeviceReady, false);	
-		console.log("register the listener");
-	});
-	
+	var count=0;
 	function onDeviceReady()
 	{
+    document.addEventListener("pause", onPause, false);
+    document.addEventListener("resume", onResume, false);
+    document.addEventListener("backbutton",onBackButton,false); 
+    window.addEventListener("batterystatus", onBatteryStatus, false);
 		console.log("onDeviceReady");
+    $.mobile.showPageLoadingMsg();
 		console.log(device);
-		$(".content").html("<ul data-role='listview'><li>"+device.name+"</li><li>"+device.cordova+"</li><li>"+device.platform+"</li><li>"+device.version+"</li><li>"+device.uuid+"</li></ul>");	
+    $(document).ready(function(){
+      $("#mybutton").bind('click', function(event){
+        alert("clicked mybutton!!");
+        $.mobile.hidePageLoadingMsg();
+        });
+
+      $(window).bind('orientationchange', function(event){
+        $("#placeholder").html("orientationchange change to " + event.orientation);
+         //alert("orientationchange !!");
+      });
+
+      $( document ).bind( "pageload", function( event, data ){
+        // Let the framework know we're going to handle the load.
+
+        event.preventDefault();
+        alert("pageload!!");
+
+        // ... load the document then insert it into the DOM ...
+        // at some point, if the load fails, either in this
+        // callback, or through some other async means, call
+        // reject like this:
+
+        data.deferred.reject( data.absUrl, data.options );
+      });
+
+      $("#tap").bind("tap", function() {
+        alert("TapEvent");
+      });
+      $("#taphold").bind("taphold", function() {
+        alert("Tap Hold Event");
+      });
+      $("#swipe").bind("swipe", function() {
+        alert("Swipe Event");
+      });
+      $("#swipeleft").bind("swipeleft", function() {
+        alert("Swipe Left Event");
+      });
+      $("#swiperight").bind("swiperight", function() {
+        alert("Swipe Right Event");
+      });
+
+      console.log("jquery ready");
+      /*$("p").each(function(index, element){
+        alert(index + "-" + $(element).html() + "");
+      });*/
+      alert("Welcome to HelloPhoneGap");
+      //alert($("ul#selector li:first").html());
+    });
+		$(".content").html("<ol data-role='listview'><li>"+device.model+"</li><li>"+device.cordova+"</li><li>"+device.platform+"</li><li>"+device.version+"</li><li>"+device.uuid+"</li></ol>");	
 	}
+
+  function onBackButton()
+  {
+    count++;
+    console.log("Trigger back button event "+ count+ " times");
+    
+  }
+
+  function onPause()
+  {
+    console.log("Application paused"); 
+  }
+
+  function onResume()
+  {
+    console.log("Application resumed"); 
+  }
+
+  function onBatteryStatus(info) {
+        console.log("Level: " + info.level + " isPlugged: " + info.isPlugged);
+        $("#battery").text("Battery Status: " + info.level + " isPlugged: " + info.isPlugged);
+  }
+
+
+  function showActivity() {
+       // navigator.notification.activityStart();
+       navigator.notification.activityStart("Busy", "Please Wait...");
+       setTimeout(activityCompleted, 3000); // 模拟长时操作
+  }
+
+  function activityCompleted() {
+        navigator.notification.activityStop();
+  } 
+
+  var currentProgressValue = 0;
+    var intervalId = -1;
+    
+  function showProgress() {
+        navigator.notification.progressStart("notification", "Processing data...");
+        intervalId = setInterval(progressJob, 50);
+  }
+    
+  function progressJob() {
+        // 处理数据
+        currentProgressValue++;
+        navigator.notification.progressValue(currentProgressValue);
+        if (currentProgressValue == 100) {
+        navigator.notification.progressStop();
+            clearInterval(intervalId);
+            currentProgressValue = 0;
+            intervalId = -1;
+        }
+  }
+
+  // Beep three times
+    //
+  function playBeep() {
+       navigator.notification.beep(1);
+  }
+
+  document.addEventListener("deviceready", onDeviceReady, false); 
+  console.log("register the listener");
 	</script>
 </head> 
 <body>
@@ -60,9 +141,10 @@
 
   Paragraph with class title practice...
 </p>
-<div id="main" data-role="page" >
+<div id="main" data-role="page" data-add-back-btn="true">
   <header data-role="header">
   <h1>Hello PhoneGap</h1></header>
+    <p>Device properties:</p>
     <div data-role="content" class="content">
       <h3>霈曉�靽⊥</h3>
     </div>
@@ -70,8 +152,11 @@
       <h2> Page Nav </h2>
         <button id="mybutton">mybutton</button>
         <a data-role="button" href="#page2">Page Navigation</a>
-        <a data-role="button" href="http://10.0.0.144:4000">Shuttle OTA</a>
+        <!--<a data-role="button" href="http://10.0.0.144:4000">Shuttle OTA</a>-->
+        <a data-role="button" href="#" onclick="showActivity(); return false;"> Show Activity</a>
         <a data-role="button" href="#dialog" data-rel="dialog" data-transition="pop"> Open Dialog </a>
+        <a data-role="button" href="#" onclick="showProgress(); return false;">showProgress</a>
+        <a data-role="button" href="#" onclick="playBeep(); return false;">Play Beep</a>
         <br>
         <br>
         <p id="tap">Tap here</p>
@@ -79,6 +164,8 @@
         <p id="swipe">Swipe in this area.</p>
         <p id="swipeleft">Swipe Left &lt;-- in this area.</p>
         <p id="swiperight">Swipe Right -- &gt; in this area.</p>
+        <div id="placeholder"></div>
+        <p id="battery"></p>
     </div>
   <footer data-role="footer" class="ui-bar">
     <a data-role="button" href="index.html" data-icon="delete">Remove</a>
@@ -89,7 +176,7 @@
 </div>
 <!-- end first page -->
 <!-- Second Page -->
-<div id="page2" data-role="page">
+<div id="page2" data-role="page" data-add-back-btn="true">
 	<header data-role="header"><h1> Second Page</h1></header>
 	   <div data-role="content">
 	     <h1> Second Page</h1>
@@ -105,6 +192,7 @@
             </li>
            </ul>
 	   </div>
+     <iframe src="https://embed.spotify.com/?uri=spotify:track:5o3DSHw1ORhM3lWxqGRvEf" width="350" height="330" frameborder="0" allowtransparency="true"></iframe>
 	   <footer data-role="footer" class="ui-bar">
     <a data-role="button" href="index.html" data-icon="delete">Remove</a>
     <a data-role="button" href="index.html" data-icon="plus">Add</a>
@@ -114,13 +202,13 @@
 </div>
 <!-- end Second page -->
 <!-- Dialog Page -->
-<div id="dialog" data-role="page">
+<div id="dialog" data-role="page"  data-add-back-btn="true">
 	<header data-role="header"><h1> Dialog Page</h1></header>
 	   <div data-role="content">
 	     <h1> Dialog Page</h1>
 	   </div>
 	   <footer data-role="footer">
-         <h4>Press back to go back to main page</h4></footer>
+         <h4>Press close to go back to main page</h4></footer>
 </div>
 <!-- end Dialog page -->
 
