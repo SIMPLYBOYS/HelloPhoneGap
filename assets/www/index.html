@@ -8,30 +8,48 @@
 	<script type="text/javascript" charset="utf-8" src="jquery.js"></script>
 	<script type="text/javascript" charset="utf-8" src="jquery.mobile-1.0.1.min.js"></script>
 	<script type="text/javascript" charset="utf-8" src="cordova.js" ></script>
+  <script type="text/javascript" charset="utf-8" src="contacts.js" ></script>
+  <script type="text/javascript" charset="utf-8" src="geolocation.js" ></script>
+  <script type="text/javascript" charset="utf-8" src="accelerometer.js" ></script>
 	<!--<script type="text/javascript" charset="utf-8" src="cordova-2.0.0.js" ></script>-->
 	<script type="text/javascript" charset="utf-8">	
 	var count=0;
+  var isConnected=false;
+  var internetInterval;
+  var isPhoneGapReady = false;
+  var currentUrl;
 	function onDeviceReady()
 	{
+    //navigator.accelerometer.getCurrentAcceleration(onAccSuccess, onAccError);
+    /*var options = new ContactFindOptions();
+    options.filter = "柔"
+    var fields = ["displayName", "name"];
+    navigator.contacts.find(fields, contactSuccess, onError, options);*/
+    isPhoneGapReady = true;
+    checkConnection();
     document.addEventListener("pause", onPause, false);
     document.addEventListener("resume", onResume, false);
-    document.addEventListener("backbutton",onBackButton,false); 
+    document.addEventListener("backbutton",onBackButton,false);
     window.addEventListener("batterystatus", onBatteryStatus, false);
+    executeEvents();
 		console.log("onDeviceReady");
-    $.mobile.showPageLoadingMsg();
 		console.log(device);
     $(document).ready(function(){
+      //$.mobile.showPageLoadingMsg();
+      //$("#shuttle").hide();
+      /*$("#shuttle").get($("#shuttle").attr("href"), function(data, status){
+        alert("states of shuttle ota link:" + status);
+      });*/ 
       $("#mybutton").bind('click', function(event){
-        alert("clicked mybutton!!");
+        //alert("clicked mybutton!!");
         $.mobile.hidePageLoadingMsg();
         });
-
       $(window).bind('orientationchange', function(event){
         $("#placeholder").html("orientationchange change to " + event.orientation);
          //alert("orientationchange !!");
       });
 
-      $( document ).bind( "pageload", function( event, data ){
+      $(document).bind( "pageload", function( event, data ){
         // Let the framework know we're going to handle the load.
 
         event.preventDefault();
@@ -65,11 +83,67 @@
       /*$("p").each(function(index, element){
         alert(index + "-" + $(element).html() + "");
       });*/
-      alert("Welcome to HelloPhoneGap");
+      if(isConnected) {
+         navigator.splashscreen.hide();
+         alert("Welcome to HelloPhoneGap");
+      } else
+         alert("Your Network connection has some problem");
       //alert($("ul#selector li:first").html());
-    });
-		$(".content").html("<ol data-role='listview'><li>"+device.model+"</li><li>"+device.cordova+"</li><li>"+device.platform+"</li><li>"+device.version+"</li><li>"+device.uuid+"</li></ol>");	
+      $(".content").html("<ol data-role='listview'><li>"+device.platform+"</li><li>"+device.model+"</li><li>"+device.cordova+"</li><li>"+device.platform+"</li><li>"+device.version+"</li><li>"+device.uuid+"</li></ol>");
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError);
+      } else {
+         alert("this device not support geolocation function");
+      }        
+    });	
 	}
+
+  function executeEvents() {
+    if (isPhoneGapReady) {
+      // attach events for online and offline detection
+      document.addEventListener("online", onOnline, false);
+      document.addEventListener("offline", onOffline, false);
+      // set a timer to check the network status
+      internetInterval = window.setInterval(function() {
+        if (navigator.network.connection.type != Connection.NONE) {
+          onOnline();
+        } else {
+          onOffline();
+        }
+      }, 5000);
+    }
+  }
+
+  function checkConnection() {
+            var networkState = navigator.connection.type;
+
+            var states = {};
+            states[Connection.UNKNOWN]  = 'Unknown connection';
+            states[Connection.ETHERNET] = 'Ethernet connection';
+            states[Connection.WIFI]     = 'WiFi connection';
+            states[Connection.CELL_2G]  = 'Cell 2G connection';
+            states[Connection.CELL_3G]  = 'Cell 3G connection';
+            states[Connection.CELL_4G]  = 'Cell 4G connection';
+            states[Connection.CELL]     = 'Cell generic connection';
+            states[Connection.NONE]     = 'No network connection';
+
+            /*switch(networkState){
+              case Connection.ETHERNET:
+              case Connection.WIFI:
+              case Connection.CELL_2G:
+              case Connection.CELL_3G:
+              case Connection.CELL:
+                   isConnected = true;
+                   break;
+
+              case Connection.UNKNOWN:
+              default:
+                   isConnected = false;
+                   break;
+            }*/
+
+            alert('Connection type: ' + states[networkState] + "  isConnected:" + isConnected);
+  }
 
   function onBackButton()
   {
@@ -80,12 +154,27 @@
 
   function onPause()
   {
-    console.log("Application paused"); 
+    isPhoneGapReady = false;
+    window.clearInterval(internetInterval);
+    console.log("Application paused");
   }
 
   function onResume()
   {
+    if(isPhoneGapReady == false){
+      init(currentUrl);
+    }
     console.log("Application resumed"); 
+  }
+
+  function onOnline(){
+     console.log("onOnline");
+    isConnected = true;
+  }
+
+  function onOffline(){
+    console.log("onOffline");
+    isConnected = false;
   }
 
   function onBatteryStatus(info) {
@@ -124,13 +213,33 @@
         }
   }
 
+  function init(url){
+     //navigator.splashscreen.show();
+     if(typeof url != 'string'){
+       currentUrl = location.href;
+     } else {
+       currentUrl = url;
+     }
+
+     if(isPhoneGapReady){
+       onDeviceReady();
+     } else {
+       document.addEventListener("deviceready", onDeviceReady, false);
+     }
+  }
+
   // Beep three times
     //
   function playBeep() {
        navigator.notification.beep(1);
   }
+  
+  $(document).bind("pageload", function(event,data){
+    alert("page data" + data.url);
+    init(data.url);
+  });
 
-  document.addEventListener("deviceready", onDeviceReady, false); 
+  window.onload = init();
   console.log("register the listener");
 	</script>
 </head> 
@@ -146,17 +255,19 @@
   <h1>Hello PhoneGap</h1></header>
     <p>Device properties:</p>
     <div data-role="content" class="content">
-      <h3>霈曉�靽⊥</h3>
+      <h3>Device Properties:</h3>
     </div>
+    <p id="geolocation">Finding geolocation...</p>
     <div data-role="content">
       <h2> Page Nav </h2>
         <button id="mybutton">mybutton</button>
         <a data-role="button" href="#page2">Page Navigation</a>
-        <!--<a data-role="button" href="http://10.0.0.144:4000">Shuttle OTA</a>-->
+        <a id="shuttle" data-role="button" href="http://10.0.0.144:4000">Shuttle OTA</a>
         <a data-role="button" href="#" onclick="showActivity(); return false;"> Show Activity</a>
         <a data-role="button" href="#dialog" data-rel="dialog" data-transition="pop"> Open Dialog </a>
         <a data-role="button" href="#" onclick="showProgress(); return false;">showProgress</a>
         <a data-role="button" href="#" onclick="playBeep(); return false;">Play Beep</a>
+        <a data-role="button" href='#' onclick="getContacts(); return false;">GetContacts</a>
         <br>
         <br>
         <p id="tap">Tap here</p>
@@ -180,6 +291,9 @@
 	<header data-role="header"><h1> Second Page</h1></header>
 	   <div data-role="content">
 	     <h1> Second Page</h1>
+         <div id="accelerometer">Waiting for accelerometer...</div>
+         <a data-role="button" href="#"  onclick="startWatch()">Start Watch</a>
+         <a data-role="button" href="#" onclick="stopWatch()">Stop Watch</a><br/><br/>
 	       <ul data-role="listview" data-theme="c">
              <li>
                <a href="usa.HTML">USA</a>
